@@ -25,8 +25,11 @@
     [fulcro.inspect.ui.multi-inspector :as multi-inspector]
     [fulcro.inspect.ui.multi-oge :as multi-oge]
     [fulcro.inspect.ui.network :as network]
+    [fulcro.inspect.ui.skins :as skins]
+    [fulcro.inspect.ui.skins.dark-mode :refer [skin-dark-mode]]
     [fulcro.inspect.ui.transactions :as transactions]
-    [goog.object :as gobj]))
+    [goog.object :as gobj]
+    [fulcro.inspect.ui.core :as ui]))
 
 (defonce electron (js/require "electron"))
 (def ipcRenderer (gobj/get electron "ipcRenderer"))
@@ -34,7 +37,10 @@
 (fp/defsc GlobalRoot [this {:keys [ui/root]}]
   {:initial-state (fn [params] {:ui/root (fp/get-initial-state multi-inspector/MultiInspector params)})
    :query         [{:ui/root (fp/get-query multi-inspector/MultiInspector)}]
-   :css           [[:body {:margin "0" :padding "0" :box-sizing "border-box"}]]
+   :css           [[:body {:background (ui/css-var ::ui/color-main-bg)
+                           :margin     "0"
+                           :padding    "0"
+                           :box-sizing "border-box"}]]
    :css-include   [multi-inspector/MultiInspector]}
   (dom/div
     (css/style-element this)
@@ -294,7 +300,8 @@
    @global-inspector*))
 
 (defn start []
-  (js/console.log "start")
+  (skins/upsert-theme-css skin-dark-mode)
+
   (if @global-inspector*
     (fulcro/mount @global-inspector* GlobalRoot @dom-node)
     (start-global-inspector {})))

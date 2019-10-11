@@ -13,6 +13,49 @@
             [goog.object :as gobj]
             [fulcro.inspect.ui.debounce-input :as di]))
 
+;; css helpers
+
+(defn cssify
+  "Replaces slashes and dots with underscore."
+  [str] (when str (str/replace str #"[./]" "_")))
+
+(defn css-var* [k]
+  (str "--" (cssify (subs (str k) 1))))
+
+(defn css-var [k]
+  (str "var(" (css-var* k) ")"))
+
+(defn to-css-vars [m]
+  (into {}
+        (map (fn [[k v]] [(css-var* k) v]))
+        m))
+
+(def css-variables
+  {::mono-font-family       "monospace"
+
+   ::label-font-family      "sans-serif"
+   ::label-font-size        "12px"
+
+   ::color-main-bg          "#fff"
+
+   ::color-bg-secondary     "#f3f3f3"
+
+   ::color-bg-row-alternate "#f5f5f5"
+   ::color-bg-light-border  "#e1e1e1"
+   ::color-bg-medium-border "#cdcdcd"
+
+   ::color-text-normal      "#5a5a5a"
+   ::color-text-strong      "#333"
+   ::color-text-faded       "#bbb"
+
+   ::color-icon-normal      "#6e6e6e"
+   ::color-icon-strong      "#333"
+
+   ::color-row-hover        "#eef3fa"
+   ::color-row-selected     "#e6e6e6"
+
+   ::box-shadow             "0 6px 6px rgba(0, 0, 0, 0.26), 0 9px 20px rgba(0, 0, 0, 0.19)"})
+
 (def mono-font-family "monospace")
 
 (def label-font-family "sans-serif")
@@ -39,10 +82,10 @@
    :padding    "7px 0"})
 
 (def css-info-label
-  {:color         color-text-normal
+  {:color         (css-var ::color-text-normal)
    :margin-bottom "6px"
    :font-weight   "bold"
-   :font-family   label-font-family
+   :font-family   (css-var ::label-font-family)
    :font-size     "13px"})
 
 (def css-timestamp
@@ -57,8 +100,8 @@
    :flex-direction "column"})
 
 (def css-triangle
-  {:font-family    label-font-family
-   :font-size      label-font-size
+  {:font-family    (css-var ::label-font-family)
+   :font-size      (css-var ::label-font-size)
    :color          "#8f8f8f"
    :cursor         "pointer"
    :vertical-align "middle"
@@ -142,11 +185,11 @@
   {:css [[:.container {:border-bottom "1px solid #dadada"
                        :display       "flex"
                        :align-items   "center"}
-          [:$c-icon {:fill      color-icon-normal
+          [:$c-icon {:fill      (css-var ::color-icon-normal)
                      :transform "scale(0.7)"}
-           [:&:hover {:fill color-icon-strong}]]
+           [:&:hover {:fill (css-var ::color-icon-strong)}]]
 
-          [:&.details {:background    "#f3f3f3"
+          [:&.details {:background    (css-var ::color-bg-secondary)
                        :border-bottom "1px solid #ccc"
                        :display       "flex"
                        :align-items   "center"
@@ -156,18 +199,18 @@
                     :display     "flex"
                     :align-items "center"}
           [(gs/& (gs/attr "disabled")) {:cursor "not-allowed"}
-           [:$c-icon {:fill color-icon-normal}]]]
+           [:$c-icon {:fill (css-var ::color-icon-normal)}]]]
 
          [:.separator {:background "#ccc"
                        :width      "1px"
                        :height     "16px"
                        :margin     "0 6px"}]
 
-         [:.input {:color       color-text-normal
+         [:.input {:color       (css-var ::color-text-normal)
                    :outline     "0"
                    :margin      "0 2px"
-                   :font-family label-font-family
-                   :font-size   label-font-size
+                   :font-family (css-var ::label-font-family)
+                   :font-size   (css-var ::label-font-size)
                    :padding     "2px 4px"}]]}
 
   (let [css (css/get-classnames ToolBar)]
@@ -212,10 +255,10 @@
    :query         [::editor-id ::editing? ::editor-value]
    :css           [[:.container {:flex 1}]
                    [:.no-label {:font-style "italic"
-                                :color      color-text-faded}]
-                   [:.label {:color       color-text-strong
-                             :font-family label-font-family
-                             :font-size   label-font-size}]
+                                :color      (css-var ::color-text-faded)}]
+                   [:.label {:color       (css-var ::color-text-strong)
+                             :font-family (css-var ::label-font-family)
+                             :font-size   (css-var ::label-font-size)}]
                    [:.input {:border     "1px solid #c7c7c7"
                              :box-shadow "0px 1px 3px 1px rgba(0, 0, 0, 0.078)"
                              :outline    "none"
@@ -245,29 +288,31 @@
 
 (fp/defui ^:once CSS
   static cssp/CSS
-  (local-rules [_] [[:.focused-panel {:border-top     "1px solid #a3a3a3"
-                                      :display        "flex"
-                                      :flex-direction "column"
-                                      :height         "50%"}]
-                    [:.focused-container css-flex-column {:overflow "auto"
-                                                          :padding  "0 10px"}]
+  (local-rules [_]
+    [[":root" (to-css-vars css-variables)]
+     [:.focused-panel {:border-top     "1px solid #a3a3a3"
+                       :display        "flex"
+                       :flex-direction "column"
+                       :height         "50%"}]
+     [:.focused-container css-flex-column {:overflow "auto"
+                                           :padding  "0 10px"}]
 
-                    [:.info-group css-info-group
-                     [(gs/& gs/first-child) {:border-top "0"}]]
-                    [:.info-label css-info-label]
-                    [:.flex {:flex "1"}]
-                    [:.ident {:padding     "5px 6px"
-                              :background  "#f3f3f3"
-                              :color       "#424242"
-                              :display     "inline-block"
-                              :font-family mono-font-family
-                              :font-size   label-font-size}]
-                    [:.display-name {:background  "#e5efff"
-                                     :color       "#051d38"
-                                     :display     "inline-block"
-                                     :padding     "4px 8px"
-                                     :font-family mono-font-family
-                                     :font-size   "14px"}]])
+     [:.info-group css-info-group
+      [(gs/& gs/first-child) {:border-top "0"}]]
+     [:.info-label css-info-label]
+     [:.flex {:flex "1"}]
+     [:.ident {:padding     "5px 6px"
+               :background  (css-var ::color-bg-secondary)
+               :color       "#424242"
+               :display     "inline-block"
+               :font-family (css-var ::mono-font-family)
+               :font-size   (css-var ::label-font-size)}]
+     [:.display-name {:background  "#e5efff"
+                      :color       "#051d38"
+                      :display     "inline-block"
+                      :padding     "4px 8px"
+                      :font-family (css-var ::mono-font-family)
+                      :font-size   "14px"}]])
   (include-children [_] [ToolBar Row InlineEditor]))
 
 (def scss (css/get-classnames CSS))

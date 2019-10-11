@@ -51,19 +51,19 @@
                                  :width          "100%"
                                  :height         "100%"
                                  :overflow       "hidden"}]
-                   [:.selector {:font-family ui/label-font-family
-                                :font-size   ui/label-font-size
+                   [:.selector {:font-family (ui/css-var ::ui/label-font-family)
+                                :font-size   (ui/css-var ::ui/label-font-size)
                                 :display     "flex"
                                 :align-items "center"
-                                :background  "#f3f3f3"
-                                :color       ui/color-text-normal
+                                :background  (ui/css-var ::ui/color-bg-secondary)
+                                :color       (ui/css-var ::ui/color-text-normal)
                                 :border-top  "1px solid #ccc"
                                 :padding     "12px"
                                 :user-select "none"}]
                    [:.label {:margin-right "10px"}]
                    [:.no-app {:display         "flex"
-                              :background      "#f3f3f3"
-                              :font-family     ui/label-font-family
+                              :background      (ui/css-var ::ui/color-bg-secondary)
+                              :font-family     (ui/css-var ::ui/label-font-family)
                               :font-size       "23px"
                               :flex            1
                               :align-items     "center"

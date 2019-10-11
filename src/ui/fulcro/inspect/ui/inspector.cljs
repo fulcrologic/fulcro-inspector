@@ -53,11 +53,11 @@
                   :width          "100%"
                   :height         "100%"
                   :overflow       "hidden"}]
-    [:.tabs {:font-family   ui/label-font-family
-             :font-size     ui/label-font-size
+    [:.tabs {:font-family   (ui/css-var ::ui/label-font-family)
+             :font-size     (ui/css-var ::ui/label-font-size)
              :display       "flex"
-             :background    "#f3f3f3"
-             :color         ui/color-text-normal
+             :background    (ui/css-var ::ui/color-bg-secondary)
+             :color         (ui/css-var ::ui/color-text-normal)
              :border-bottom "1px solid #ccc"
              :position      "relative"
              :user-select   "none"}]
@@ -66,11 +66,11 @@
             :padding "6px 10px 5px"}
 
      [:&:hover {:background "#e5e5e5"
-                :color      ui/color-text-strong}]
+                :color      (ui/css-var ::ui/color-text-strong)}]
      [:&.tab-selected {:border-bottom "2px solid #5c7ebb"
-                       :color         ui/color-text-strong
+                       :color         (ui/css-var ::ui/color-text-strong)
                        :margin-bottom "-1px"}]
-     [:&.tab-disabled {:color  ui/color-text-faded
+     [:&.tab-disabled {:color  (ui/css-var ::ui/color-text-faded)
                        :cursor "default"}
       [:&:hover {:background "transparent"}]]]
     [:.tab-content {:flex     "1"
@@ -85,16 +85,16 @@
                    :z-index       "1"
                    :right         "0"
                    :top           "26px"
-                   :background    "#f3f3f3"
+                   :background    (ui/css-var ::ui/color-bg-secondary)
                    :padding       "14px"
                    :border        "1px solid #C8C8C8"
                    :border-radius "4px"
-                   :box-shadow    ui/box-shadow}]
+                   :box-shadow    (ui/css-var ::ui/box-shadow)}]
     [:.dock-side {:display     "flex"
                   :align-items "center"}]
     [:.dock-title {:margin-right "10px"
-                   :font-family  ui/label-font-family
-                   :font-size    ui/label-font-size}]
+                   :font-family  (ui/css-var ::ui/label-font-family)
+                   :font-size    (ui/css-var ::ui/label-font-size)}]
     [:.dock-icon {:cursor "pointer"
                   :width  "14px"
                   :height "12px"

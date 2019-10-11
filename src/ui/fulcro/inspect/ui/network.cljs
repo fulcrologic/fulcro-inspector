@@ -133,14 +133,14 @@
    :query         [::request-id ::request-edn ::request-edn-row-view ::response-edn ::remote
                    ::request-started-at ::request-finished-at ::error]
    :css           (fn []
-                    (let [border (str "1px solid " ui/color-bg-light-border)]
+                    (let [border (str "1px solid " (ui/css-var ::ui/color-bg-light-border))]
                       [[:.row {:cursor  "pointer"
                                :display "flex"}
-                        [(gs/& (gs/nth-child :odd)) {:background ui/color-bg-light}]
-                        [:&:hover {:background (str ui/color-row-hover "!important")}]
+                        [(gs/& (gs/nth-child :odd)) {:background (ui/css-var ::ui/color-bg-row-alternate)}]
+                        [:&:hover {:background (str (ui/css-var ::ui/color-row-hover) "!important")}]
                         [:&.error {:color "#e80000"}]
-                        [:&.selected {:background (str ui/color-row-selected "!important")}]]
-                       [:.pending {:color ui/color-text-faded}]
+                        [:&.selected {:background (str (ui/css-var ::ui/color-row-selected) "!important")}]]
+                       [:.pending {:color (ui/css-var ::ui/color-text-faded)}]
                        [:.table-cell {:border-right  border
                                       :border-bottom border
                                       :padding       "2px 2px"
@@ -149,7 +149,7 @@
                         [:&.flex {:flex 1}]
                         [(gs/& gs/last-child) {:border-right "0"}]]
 
-                       [:.request {:overflow "auto"
+                       [:.request {:overflow   "auto"
                                    :max-height "250px"}]
 
                        [:.timestamp ui/css-timestamp]]))
@@ -204,14 +204,14 @@
                    {::requests (fp/get-query Request)}
                    {::active-request (fp/get-query RequestDetails)}]
    :css           (fn []
-                    (let [border (str "1px solid " ui/color-bg-medium-border)]
+                    (let [border (str "1px solid " (ui/css-var ::ui/color-bg-medium-border))]
                       [[:.container {:flex           1
                                      :display        "flex"
                                      :flex-direction "column"
                                      :width          "100%"}
                         [:* {:box-sizing "border-box"}]]
-                       [:.table {:font-family     ui/label-font-family
-                                 :font-size       ui/label-font-size
+                       [:.table {:font-family     (ui/css-var ::ui/label-font-family)
+                                 :font-size       (ui/css-var ::ui/label-font-size)
                                  :width           "100%"
                                  :border-collapse "collapse"
                                  :color           "#313942"

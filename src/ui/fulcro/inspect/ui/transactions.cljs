@@ -100,11 +100,11 @@
                                  :align-items   "center"
                                  :padding       "5px 0"}
                     [:.icon {:display "none"}]
-                    [:&:hover {:background ui/color-row-hover}
+                    [:&:hover {:background (ui/css-var ::ui/color-row-hover)}
                      [:.icon {:display "block"}]]
-                    [:&.selected {:background ui/color-row-selected}]]
+                    [:&.selected {:background (ui/css-var ::ui/color-row-selected)}]]
                    [:.compress-count {:color         "#fff"
-                                      :font-family   ui/mono-font-family
+                                      :font-family   (ui/css-var ::ui/mono-font-family)
                                       :font-size     "13px"
                                       :background    "#6D84AF"
                                       :padding       "0px 3px"
@@ -115,9 +115,9 @@
                                       :max-height "100px"
                                       :overflow   "auto"}]
                    [:.icon {:margin "-5px 6px"}
-                    [:$c-icon {:fill      ui/color-icon-normal
+                    [:$c-icon {:fill      (ui/css-var ::ui/color-icon-normal)
                                :transform "scale(0.7)"}
-                     [:&:hover {:fill ui/color-icon-strong}]]]
+                     [:&:hover {:fill (ui/css-var ::ui/color-icon-strong)}]]]
                    [:.timestamp ui/css-timestamp]]
    :css-include   [data-viewer/DataViewer]}
   (dom/div :.container {:classes [(if selected? :.selected)]

@@ -67,9 +67,9 @@
                             :font-size  "14px"}]
                    [:.remote-selector {:display     "flex"
                                        :align-items "center"
-                                       :font-family cui/label-font-family
-                                       :font-size   cui/label-font-size
-                                       :color       cui/color-text-normal}]
+                                       :font-family (cui/css-var ::cui/label-font-family)
+                                       :font-size   (cui/css-var ::cui/label-font-size)
+                                       :color       (cui/css-var ::cui/color-text-normal)}]
                    [:.remote-selector-label {:margin-right "8px"
                                              :margin-left  "4px"}]]}
   (let [remotes  (mapv explorer->remote explorers)

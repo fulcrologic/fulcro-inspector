@@ -24,8 +24,8 @@
    :query         [::id
                    ::locales
                    ::current-locale]
-   :css           [[:.label {:font-family ui/label-font-family
-                             :font-size   ui/label-font-size
+   :css           [[:.label {:font-family (ui/css-var ::ui/label-font-family)
+                             :font-size   (ui/css-var ::ui/label-font-size)
                              :margin      "0 4px"}]
                    [:.container {:flex           1
                                  :display        "flex"

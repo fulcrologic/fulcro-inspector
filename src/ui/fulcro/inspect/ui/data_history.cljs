@@ -94,13 +94,13 @@
                     [:.action {:fill "#fff"}]]
                    [:.action {:cursor     "pointer"
                               :visibility "hidden"
-                              :fill       ui/color-text-normal
+                              :fill       (ui/css-var ::ui/color-text-normal)
                               :transform  "scale(0.8)"}]
                    [:.label {:display     "flex"
                              :flex        "1"
                              :padding     "0 6px"
-                             :font-family ui/label-font-family
-                             :font-size   ui/label-font-size}]
+                             :font-family (ui/css-var ::ui/label-font-family)
+                             :font-size   (ui/css-var ::ui/label-font-size)}]
                    [:.date (merge ui/css-timestamp {:margin "0"})]
                    [:.flex {:flex "1"}]]}
   (dom/div :.container {:className (if current? (:current css))}

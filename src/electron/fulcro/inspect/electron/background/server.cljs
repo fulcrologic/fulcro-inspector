@@ -18,31 +18,39 @@
 (def ws (nodejs/require "ws"))
 (def body-parser (nodejs/require "body-parser"))
 
-(let [packer (tp/make-packer {})
-      {:keys [ch-recv send-fn ajax-post-fn ajax-get-or-ws-handshake-fn
-              connected-uids]}
-      (sente-express/make-express-channel-socket-server!
-        {:packer     packer
-         :user-id-fn (fn [ring-req] (aget (:body ring-req) "session" "uid"))})]
-  (def ajax-post ajax-post-fn)
-  (def ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
-  ;; TODO: Watch this async channel for incoming requests
-  (def ch-chsk ch-recv)                                     ; ChannelSocket's receive channel
-  ;; TODO: This is how to send a push...
-  (def chsk-send! send-fn)                                  ; ChannelSocket's send API fn
-  ;; TODO: Watch this for connect/disconnect?
-  (def connected-uids connected-uids)                       ; Watchable, read-only atom
-  )
+;; server contains: {:keys [ch-recv send-fn ajax-post-fn ajax-get-or-ws-handshake-fn connected-uids]}
+(defonce channel-socket-server
+  (let [packer (tp/make-packer {})
+        ]
+    (sente-express/make-express-channel-socket-server!
+      {:packer     packer
+       ;; With websockets, the client will send a GET with a websocket promotion ability. this is the ONE HTPP
+       ;; request that will arrive for a new inspect client...all other comms go over the maintained connection.
+       ;; This function therefore establishes a sente "user ID" for that particular connection. I recommend we make
+       ;; a 1-to-1 relation from connection to app-uuid if possible...otherwise this defaults to a random UUID I think
+       ;; if you don't supply it
+       :user-id-fn (fn [ring-req]
+                     ;; FIXME???
+                     ;; IF the app-uuid can be sent in params, then
+                     ;; I'd return that here instead, so you can just watch app uuid disconnect/reconnect on the
+                     ;; connected-uuids atom
+                     (random-uuid))})
+    ;; TODO: ch-recv...Watch this async channel for incoming requests
+    ;; TODO: send-fn...This is how to send a push...
+    ;; TODO: connected-uids...Watch this for connect/disconnect? NOTE: this is UIDs, which are translated via
+    ;; a function you can supply on line 27
+    ))
 
-(defn routes [express-app]
+(defn routes [{:keys [ajax-post-fn ajax-get-or-ws-handshake-fn
+                      ]} express-app]
   (doto express-app
     (.ws "/chsk"
       (fn [ws req next]
-        (ajax-get-or-ws-handshake req nil nil
+        (ajax-get-or-ws-handshake-fn req nil nil
           {:websocket? true
            :websocket  ws})))
-    (.get "/chsk" ajax-get-or-ws-handshake)
-    (.post "/chsk" ajax-post)
+    (.get "/chsk" ajax-get-or-ws-handshake-fn)
+    (.post "/chsk" ajax-post-fn)
     (.use (fn [req res next]
             (log/warn "Unhandled request: %s" (.-originalUrl req))
             (next)))))
@@ -69,22 +77,31 @@
        :stop-fn     #(.close http-server)
        :port        port})))
 
+;; websocket messages should be forwarded through this function...be careful of the format
 (defn process-client-message [web-contents msg reply-fn]
   (try
+    ;; TO the renderer
     (when web-contents
       (.send web-contents "event" #js {"fulcro-inspect-remote-message" msg}))
     (catch :default e
       (js/console.error e))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ORIGINAL SOCKET IO CODE...PORT TO SENTE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn start! [{:keys [content-atom]}]
   (let [io (Server)]
+    ;; port to core async go loops and atom watches (for connect/disconnect)
     (.on ipcMain "event" (fn [evt arg]
                            (when @the-client
+                             ;; TODO: change to chsk-send!
                              (.emit @the-client "event" arg))))
+    ;; Becomes watch-based...uuid appears/disappears in connected-uuids
     (.on io "connection" (fn [client]
                            ;; TODO: this should be tracked on app started with app ID associated to websocket client ID
                            (reset! the-client client)
-                           ;; This is just incoming events, which we're going to encode
+                           ;; Convert to core async go loop
                            (.on client "event"
                              (fn [data reply-fn]
                                ;; TODO: Going to send something that can be processed by a parser...
